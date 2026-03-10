@@ -149,9 +149,14 @@
   section {
     padding: 4rem 0;
     border-bottom: 1px solid var(--rule);
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  section.reveal {
     opacity: 0;
     transform: translateY(20px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
   }
 
   section.visible { opacity: 1; transform: translateY(0); }
@@ -235,6 +240,13 @@
     color: var(--muted);
     padding-top: 0.15rem;
   }
+
+  .company-link {
+    text-decoration: none;
+    color: inherit;
+  }
+  .company-link:hover .company { color: var(--accent); }
+  .company-link .company { transition: color 0.2s; }
 
   .exp-meta .company {
     color: var(--ink);
@@ -481,7 +493,7 @@
 
     <div class="exp-item">
       <div class="exp-meta">
-        <span class="company">Qore (Appzone)</span>
+        <a href="https://web.recova.ng" target="_blank" rel="noopener" class="company-link"><span class="company">Qore (Appzone) ↗</span></a>
         <span class="period">Apr 2023 – Present</span>
         <span class="badge">Full-time · Hybrid</span>
       </div>
@@ -498,7 +510,7 @@
 
     <div class="exp-item">
       <div class="exp-meta">
-        <span class="company">Flolyt</span>
+        <a href="https://www.flolyt.com" target="_blank" rel="noopener" class="company-link"><span class="company">Flolyt ↗</span></a>
         <span class="period">Mar 2025 – Oct 2025</span>
         <span class="badge">Contract · Remote</span>
       </div>
@@ -515,7 +527,7 @@
 
     <div class="exp-item">
       <div class="exp-meta">
-        <span class="company">Smartharvest</span>
+        <a href="https://smartharvestltd.com" target="_blank" rel="noopener" class="company-link"><span class="company">Smartharvest ↗</span></a>
         <span class="period">Feb 2023 – Sep 2024</span>
         <span class="badge">Contract · Remote</span>
       </div>
@@ -620,17 +632,21 @@
     el.addEventListener('mouseleave', () => cursor.classList.remove('expand'));
   });
 
-  // Scroll reveal
+  // Scroll reveal — add reveal class via JS so content is visible without JS
   const sections = document.querySelectorAll('section');
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
+        entry.target.classList.remove('reveal');
         entry.target.classList.add('visible');
       }
     });
   }, { threshold: 0.08 });
 
-  sections.forEach(s => observer.observe(s));
+  sections.forEach(s => {
+    s.classList.add('reveal');
+    observer.observe(s);
+  });
 </script>
 </body>
 </html>
