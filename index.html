@@ -8,431 +8,87 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300&display=swap" rel="stylesheet" />
 <style>
-  :root {
-    --bg: #f5f2ed;
-    --ink: #1a1714;
-    --accent: #c8492a;
-    --muted: #8a8278;
-    --rule: #d6d0c8;
-    --card: #efebe4;
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: 'DM Mono', monospace;
-    font-weight: 300;
-    font-size: 13px;
-    line-height: 1.7;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ── NOISE OVERLAY ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    background-size: 200px 200px;
-    pointer-events: none;
-    z-index: 999;
-    opacity: 0.4;
-  }
-
-  /* ── CURSOR ── */
-  .cursor {
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-    position: fixed;
-    top: 0; left: 0;
-    pointer-events: none;
-    z-index: 9999;
-    transition: transform 0.15s ease, width 0.2s, height 0.2s;
-    transform: translate(-50%, -50%);
-  }
-  .cursor.expand { width: 24px; height: 24px; background: transparent; border: 1px solid var(--accent); }
-
-  /* ── LAYOUT ── */
-  .wrapper {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 2rem;
-  }
-
-  /* ── HEADER ── */
-  header {
-    padding: 5rem 0 4rem;
-    border-bottom: 1px solid var(--rule);
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    gap: 2rem;
-    opacity: 0;
-    animation: fadeUp 0.9s ease 0.1s forwards;
-  }
-
-  .name {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(2.8rem, 6vw, 5rem);
-    font-weight: 200;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-  }
-
-  .name em {
-    font-style: italic;
-    color: var(--accent);
-  }
-
-  .title-tag {
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-top: 0.75rem;
-  }
-
-  .contact-col {
-    text-align: right;
-    color: var(--muted);
-    font-size: 11px;
-    line-height: 2;
-  }
-
-  .contact-col a {
-    color: var(--ink);
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.2s;
-  }
-  .contact-col a:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* ── NAV ── */
-  nav {
-    display: flex;
-    gap: 2.5rem;
-    padding: 1.5rem 0;
-    border-bottom: 1px solid var(--rule);
-    opacity: 0;
-    animation: fadeUp 0.9s ease 0.25s forwards;
-  }
-
-  nav a {
-    text-decoration: none;
-    color: var(--muted);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    transition: color 0.2s;
-    position: relative;
-  }
-
-  nav a::after {
-    content: '';
-    position: absolute;
-    bottom: -2px; left: 0;
-    width: 0; height: 1px;
-    background: var(--accent);
-    transition: width 0.25s ease;
-  }
-
-  nav a:hover { color: var(--ink); }
-  nav a:hover::after { width: 100%; }
-
-  /* ── SECTIONS ── */
-  section {
-    padding: 4rem 0;
-    border-bottom: 1px solid var(--rule);
-    opacity: 1;
-    transform: none;
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-
-  section.reveal {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  section.visible { opacity: 1; transform: translateY(0); }
-
-  .section-label {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 2.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--rule);
-  }
-
-  /* ── SUMMARY ── */
-  #about .lead {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
-    font-weight: 300;
-    line-height: 1.5;
-    max-width: 680px;
-    color: var(--ink);
-  }
-
-  #about .lead em { font-style: italic; color: var(--accent); }
-
-  /* ── SKILLS ── */
-  .skills-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1px;
-    background: var(--rule);
-    border: 1px solid var(--rule);
-  }
-
-  .skill-block {
-    background: var(--bg);
-    padding: 1.5rem;
-    transition: background 0.2s;
-  }
-
-  .skill-block:hover { background: var(--card); }
-
-  .skill-block h3 {
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 0.75rem;
-    font-weight: 500;
-  }
-
-  .skill-block p {
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.8;
-  }
-
-  /* ── EXPERIENCE ── */
-  .exp-item {
-    display: grid;
-    grid-template-columns: 160px 1fr;
-    gap: 2rem;
-    padding: 2rem 0;
-    border-top: 1px solid var(--rule);
-    position: relative;
-  }
-
-  .exp-item:first-of-type { border-top: none; padding-top: 0; }
-
-  .exp-meta {
-    font-size: 11px;
-    color: var(--muted);
-    padding-top: 0.15rem;
-  }
-
-  .company-link {
-    text-decoration: none;
-    color: inherit;
-  }
-  .company-link:hover .company { color: var(--accent); }
-  .company-link .company { transition: color 0.2s; }
-
-  .exp-meta .company {
-    color: var(--ink);
-    font-weight: 500;
-    display: block;
-    margin-bottom: 0.25rem;
-  }
-
-  .exp-meta .period {
-    font-size: 10px;
-    letter-spacing: 0.05em;
-  }
-
-  .exp-meta .badge {
-    display: inline-block;
-    margin-top: 0.5rem;
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    border: 1px solid var(--rule);
-    padding: 2px 6px;
-    color: var(--muted);
-  }
-
-  .exp-body h3 {
-    font-family: 'Fraunces', serif;
-    font-size: 1.1rem;
-    font-weight: 300;
-    margin-bottom: 0.75rem;
-    color: var(--ink);
-  }
-
-  .exp-body ul {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-
-  .exp-body li {
-    color: var(--muted);
-    padding-left: 1.25rem;
-    position: relative;
-    font-size: 12px;
-    line-height: 1.7;
-  }
-
-  .exp-body li::before {
-    content: '—';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    opacity: 0.6;
-  }
-
-  /* ── AI SECTION ── */
-  .ai-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--rule);
-    border: 1px solid var(--rule);
-  }
-
-  .ai-card {
-    background: var(--bg);
-    padding: 1.75rem;
-    transition: background 0.2s;
-  }
-
-  .ai-card:hover { background: var(--card); }
-
-  .ai-card .num {
-    font-family: 'Fraunces', serif;
-    font-size: 2.5rem;
-    font-weight: 200;
-    color: var(--rule);
-    line-height: 1;
-    margin-bottom: 0.5rem;
-    font-style: italic;
-  }
-
-  .ai-card p { color: var(--muted); font-size: 12px; line-height: 1.7; }
-  .ai-card strong { color: var(--ink); font-weight: 500; }
-
-  /* ── EDUCATION ── */
-  #education .edu-block {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 2rem;
-  }
-
-  .edu-title {
-    font-family: 'Fraunces', serif;
-    font-size: 1.3rem;
-    font-weight: 300;
-  }
-
-  .edu-sub { color: var(--muted); font-size: 11px; margin-top: 0.25rem; }
-
-  .edu-year {
-    color: var(--muted);
-    font-size: 11px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    padding: 3rem 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    opacity: 0;
-    animation: fadeUp 0.9s ease 0.6s forwards;
-  }
-
-  footer .copy {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-  }
-
-  .available {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #4caf7d;
-    animation: pulse 2s ease infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .footer-link {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
-  }
-  .footer-link:hover { color: var(--accent); border-color: var(--accent); }
-
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 3px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--rule); }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 600px) {
-    header { grid-template-columns: 1fr; }
-    .contact-col { text-align: left; }
-    .exp-item { grid-template-columns: 1fr; gap: 0.5rem; }
-    .ai-grid { grid-template-columns: 1fr; }
-    #education .edu-block { flex-direction: column; gap: 0.25rem; }
-    nav { flex-wrap: wrap; gap: 1.5rem; }
-  }
+  :root { --bg:#f5f2ed;--ink:#1a1714;--accent:#c8492a;--muted:#8a8278;--rule:#d6d0c8;--card:#efebe4; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-weight:300;font-size:13px;line-height:1.7;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");background-size:200px 200px;pointer-events:none;z-index:999;opacity:0.4}
+  .cursor{width:6px;height:6px;background:var(--accent);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transition:transform .15s ease,width .2s,height .2s;transform:translate(-50%,-50%)}
+  .cursor.expand{width:24px;height:24px;background:transparent;border:1px solid var(--accent)}
+  .wrapper{max-width:960px;margin:0 auto;padding:0 2rem}
+  header{padding:5rem 0 4rem;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:1fr auto;align-items:end;gap:2rem;opacity:0;animation:fadeUp .9s ease .1s forwards}
+  .name{font-family:'Fraunces',serif;font-size:clamp(2.8rem,6vw,5rem);font-weight:200;line-height:1.05;letter-spacing:-.02em}
+  .name em{font-style:italic;color:var(--accent)}
+  .title-tag{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.75rem}
+  .contact-col{text-align:right;color:var(--muted);font-size:11px;line-height:2}
+  .contact-col a{color:var(--ink);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .2s}
+  .contact-col a:hover{border-color:var(--accent);color:var(--accent)}
+  nav{display:flex;gap:2.5rem;padding:1.5rem 0;border-bottom:1px solid var(--rule);opacity:0;animation:fadeUp .9s ease .25s forwards}
+  nav a{text-decoration:none;color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase;transition:color .2s;position:relative}
+  nav a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--accent);transition:width .25s ease}
+  nav a:hover{color:var(--ink)}
+  nav a:hover::after{width:100%}
+  section{padding:4rem 0;border-bottom:1px solid var(--rule);transition:opacity .7s ease,transform .7s ease}
+  section.reveal{opacity:0;transform:translateY(20px)}
+  section.visible{opacity:1;transform:translateY(0)}
+  .section-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:2.5rem;display:flex;align-items:center;gap:1rem}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--rule)}
+  #about .lead{font-family:'Fraunces',serif;font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:300;line-height:1.5;max-width:680px;color:var(--ink)}
+  #about .lead em{font-style:italic;color:var(--accent)}
+  .skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+  .skill-block{background:var(--bg);padding:1.5rem;transition:background .2s}
+  .skill-block:hover{background:var(--card)}
+  .skill-block h3{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem;font-weight:500}
+  .skill-block p{color:var(--muted);font-size:12px;line-height:1.8}
+  .exp-item{display:grid;grid-template-columns:160px 1fr;gap:2rem;padding:2rem 0;border-top:1px solid var(--rule)}
+  .exp-item:first-of-type{border-top:none;padding-top:0}
+  .exp-meta{font-size:11px;color:var(--muted);padding-top:.15rem}
+  .company-link{text-decoration:none;color:inherit}
+  .company-link:hover .company{color:var(--accent)}
+  .company-link .company{transition:color .2s}
+  .exp-meta .company{color:var(--ink);font-weight:500;display:block;margin-bottom:.25rem}
+  .exp-meta .period{font-size:10px;letter-spacing:.05em}
+  .exp-meta .badge{display:inline-block;margin-top:.5rem;font-size:9px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--rule);padding:2px 6px;color:var(--muted)}
+  .exp-body h3{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:300;margin-bottom:.75rem;color:var(--ink)}
+  .exp-body ul{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+  .exp-body li{color:var(--muted);padding-left:1.25rem;position:relative;font-size:12px;line-height:1.7}
+  .exp-body li::before{content:'—';position:absolute;left:0;color:var(--accent);opacity:.6}
+  .ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule)}
+  .ai-card{background:var(--bg);padding:1.75rem;transition:background .2s}
+  .ai-card:hover{background:var(--card)}
+  .ai-card .num{font-family:'Fraunces',serif;font-size:2.5rem;font-weight:200;color:var(--rule);line-height:1;margin-bottom:.5rem;font-style:italic}
+  .ai-card p{color:var(--muted);font-size:12px;line-height:1.7}
+  .ai-card strong{color:var(--ink);font-weight:500}
+  /* FinAgent featured card */
+  .ai-card-featured{grid-column:1/-1;background:var(--bg);padding:1.75rem;display:flex;gap:2.5rem;align-items:flex-start;text-decoration:none;color:inherit;transition:background .2s;border-top:1px solid var(--rule)}
+  .ai-card-featured:hover{background:var(--card)}
+  .ai-card-featured:hover .feat-link{color:var(--accent);border-color:var(--accent)}
+  .feat-num{font-family:'Fraunces',serif;font-size:2.5rem;font-weight:200;color:var(--rule);line-height:1;font-style:italic;flex-shrink:0}
+  .feat-body{flex:1}
+  .feat-body strong{color:var(--ink);font-weight:500;font-size:12px}
+  .feat-body p{color:var(--muted);font-size:12px;line-height:1.7;margin-top:.3rem}
+  .feat-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:.85rem}
+  .feat-tag{font-size:9px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--rule);padding:2px 6px;color:var(--muted)}
+  .feat-link{display:inline-block;margin-top:.9rem;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--rule);padding-bottom:1px;transition:color .2s,border-color .2s}
+  #education .edu-block{display:flex;justify-content:space-between;align-items:baseline;gap:2rem}
+  .edu-title{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:300}
+  .edu-sub{color:var(--muted);font-size:11px;margin-top:.25rem}
+  footer{padding:3rem 0;display:flex;justify-content:space-between;align-items:center;opacity:0;animation:fadeUp .9s ease .6s forwards}
+  footer .copy{font-size:10px;letter-spacing:.1em;color:var(--muted)}
+  .available{display:flex;align-items:center;gap:.5rem;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .dot{width:6px;height:6px;border-radius:50%;background:#4caf7d;animation:pulse 2s ease infinite}
+  .footer-link{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-decoration:none;border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+  .footer-link:hover{color:var(--accent);border-color:var(--accent)}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--rule)}
+  @media(max-width:600px){header{grid-template-columns:1fr}.contact-col{text-align:left}.exp-item{grid-template-columns:1fr;gap:.5rem}.ai-grid{grid-template-columns:1fr}.ai-card-featured{flex-direction:column;gap:.75rem}#education .edu-block{flex-direction:column;gap:.25rem}nav{flex-wrap:wrap;gap:1.5rem}}
 </style>
 </head>
 <body>
-
 <div class="cursor" id="cursor"></div>
-
 <div class="wrapper">
 
-  <!-- HEADER -->
   <header>
     <div>
       <h1 class="name">Honour <em>U.</em> Nosakhare</h1>
@@ -447,7 +103,6 @@
     </div>
   </header>
 
-  <!-- NAV -->
   <nav>
     <a href="#about">About</a>
     <a href="#skills">Skills</a>
@@ -456,163 +111,76 @@
     <a href="#education">Education</a>
   </nav>
 
-  <!-- ABOUT -->
   <section id="about">
     <p class="section-label">Profile</p>
-    <p class="lead">
-      Senior Frontend Developer with <em>8 years</em> of experience building scalable, high-performance web and mobile applications across fintech, agri-tech, and customer engagement platforms. Adept at translating complex requirements into clean, maintainable code with a strong focus on modern architecture, developer experience, and <em>shipping products that users love</em>.
-    </p>
+    <p class="lead">Senior Frontend Developer with <em>8 years</em> of experience building scalable, high-performance web and mobile applications across fintech, agri-tech, and customer engagement platforms. Adept at translating complex requirements into clean, maintainable code with a strong focus on modern architecture, developer experience, and <em>shipping products that users love</em>.</p>
   </section>
 
-  <!-- SKILLS -->
   <section id="skills">
     <p class="section-label">Technical Skills</p>
     <div class="skills-grid">
-      <div class="skill-block">
-        <h3>Frontend</h3>
-        <p>JavaScript (ES2022+), TypeScript, React.js, Next.js, React Native, Tailwind CSS, Figma</p>
-      </div>
-      <div class="skill-block">
-        <h3>Backend &amp; Data</h3>
-        <p>Node.js, Blitz.js, Prisma ORM, MongoDB, REST APIs, GraphQL</p>
-      </div>
-      <div class="skill-block">
-        <h3>AI &amp; Automation</h3>
-        <p>OpenAI Codex 5.4, Claude Opus 4.6, Cursor Composer 2, AI agent workflows, Prompt Engineering</p>
-      </div>
-      <div class="skill-block">
-        <h3>Tools &amp; Practices</h3>
-        <p>Git, CI/CD pipelines, Agile/Scrum, Web Accessibility (WCAG), Performance Optimisation</p>
-      </div>
+      <div class="skill-block"><h3>Frontend</h3><p>JavaScript (ES2022+), TypeScript, React.js, Next.js, React Native, Tailwind CSS, Figma</p></div>
+      <div class="skill-block"><h3>Backend &amp; Data</h3><p>Node.js, Blitz.js, Prisma ORM, MongoDB, REST APIs, GraphQL</p></div>
+      <div class="skill-block"><h3>AI &amp; Automation</h3><p>OpenAI Codex 5.4, Claude Opus 4.6, Cursor Composer 2, AI agent workflows, Prompt Engineering</p></div>
+      <div class="skill-block"><h3>Tools &amp; Practices</h3><p>Git, CI/CD pipelines, Agile/Scrum, Web Accessibility (WCAG), Performance Optimisation</p></div>
     </div>
   </section>
 
-  <!-- EXPERIENCE -->
   <section id="experience">
     <p class="section-label">Experience</p>
-
     <div class="exp-item">
-      <div class="exp-meta">
-        <a href="https://web.recova.ng" target="_blank" rel="noopener" class="company-link"><span class="company">Qore (Appzone) ↗</span></a>
-        <span class="period">Apr 2023 – Present</span>
-        <span class="badge">Full-time · Hybrid</span>
-      </div>
-      <div class="exp-body">
-        <h3>Frontend Developer</h3>
-        <ul>
-          <li>Led end-to-end redesign of the core banking application, significantly improving UI/UX consistency and accessibility across all major touchpoints.</li>
-          <li>Architected a dynamic rule engine that reduced configuration time by ~40%, eliminating repetitive manual setup for operations teams.</li>
-          <li>Integrated multi-bank debit and credit risk systems, enabling real-time transaction decisioning at scale.</li>
-          <li>Championed component reusability and design-system adoption, reducing frontend duplication across product squads.</li>
-        </ul>
-      </div>
+      <div class="exp-meta"><a href="https://web.recova.ng" target="_blank" rel="noopener" class="company-link"><span class="company">Qore (Appzone) ↗</span></a><span class="period">Apr 2023 – Present</span><span class="badge">Full-time · Hybrid</span></div>
+      <div class="exp-body"><h3>Frontend Developer</h3><ul><li>Led end-to-end redesign of the core banking application, significantly improving UI/UX consistency and accessibility across all major touchpoints.</li><li>Architected a dynamic rule engine that reduced configuration time by ~40%, eliminating repetitive manual setup for operations teams.</li><li>Integrated multi-bank debit and credit risk systems, enabling real-time transaction decisioning at scale.</li><li>Championed component reusability and design-system adoption, reducing frontend duplication across product squads.</li></ul></div>
     </div>
-
     <div class="exp-item">
-      <div class="exp-meta">
-        <a href="https://www.flolyt.com" target="_blank" rel="noopener" class="company-link"><span class="company">Flolyt ↗</span></a>
-        <span class="period">2025</span>
-        <span class="badge">Contract · Remote</span>
-      </div>
-      <div class="exp-body">
-        <h3>Frontend Developer</h3>
-        <ul>
-          <li>Built key product features for a customer engagement platform serving thousands of active users.</li>
-          <li>Developed an intuitive visual campaign workflow builder, enabling non-technical users to configure complex marketing automations.</li>
-          <li>Integrated multi-channel messaging systems (email, SMS, push notifications) into a unified campaign interface.</li>
-          <li>Leveraged AI-assisted features to auto-suggest optimal message timing and audience segmentation rules.</li>
-        </ul>
-      </div>
+      <div class="exp-meta"><a href="https://www.flolyt.com" target="_blank" rel="noopener" class="company-link"><span class="company">Flolyt ↗</span></a><span class="period">2025</span><span class="badge">Contract · Remote</span></div>
+      <div class="exp-body"><h3>Frontend Developer</h3><ul><li>Built key product features for a customer engagement platform serving thousands of active users.</li><li>Developed an intuitive visual campaign workflow builder, enabling non-technical users to configure complex marketing automations.</li><li>Integrated multi-channel messaging systems (email, SMS, push notifications) into a unified campaign interface.</li><li>Leveraged AI-assisted features to auto-suggest optimal message timing and audience segmentation rules.</li></ul></div>
     </div>
-
     <div class="exp-item">
-      <div class="exp-meta">
-        <a href="https://smartharvestltd.com" target="_blank" rel="noopener" class="company-link"><span class="company">Smartharvest ↗</span></a>
-        <span class="period">2022 – 2024</span>
-        <span class="badge">Full-time · Remote</span>
-      </div>
-      <div class="exp-body">
-        <h3>Full-Stack Developer</h3>
-        <ul>
-          <li>Built a comprehensive farm management system using Next.js and MongoDB, supporting hundreds of farm operators across multiple regions.</li>
-          <li>Designed interactive dashboards for real-time crop monitoring, yield tracking, and resource planning.</li>
-          <li>Developed AI-powered crop advisory tools integrating GPT-4 to provide personalised, context-aware farming recommendations.</li>
-          <li>Contributed across the full stack — from REST API design and database modelling to responsive frontend delivery.</li>
-        </ul>
-      </div>
+      <div class="exp-meta"><a href="https://smartharvestltd.com" target="_blank" rel="noopener" class="company-link"><span class="company">Smartharvest ↗</span></a><span class="period">2022 – 2024</span><span class="badge">Full-time · Remote</span></div>
+      <div class="exp-body"><h3>Full-Stack Developer</h3><ul><li>Built a comprehensive farm management system using Next.js and MongoDB, supporting hundreds of farm operators across multiple regions.</li><li>Designed interactive dashboards for real-time crop monitoring, yield tracking, and resource planning.</li><li>Developed AI-powered crop advisory tools integrating GPT-4 to provide personalised, context-aware farming recommendations.</li><li>Contributed across the full stack — from REST API design and database modelling to responsive frontend delivery.</li></ul></div>
     </div>
-
     <div class="exp-item">
-      <div class="exp-meta">
-        <span class="company">Quickbank</span>
-        <span class="period">2020 – 2022</span>
-        <span class="badge">Full-time · Remote</span>
-      </div>
-      <div class="exp-body">
-        <h3>Mobile Developer</h3>
-        <ul>
-          <li>Developed a cross-platform React Native banking application from scratch, targeting both iOS and Android.</li>
-          <li>Implemented secure biometric and PIN-based authentication alongside encrypted transaction flows compliant with banking standards.</li>
-          <li>Worked closely with backend engineers to integrate payment processing, account management, and notification APIs.</li>
-          <li>Ensured consistent UX across platforms, with robust offline-handling and smooth state synchronisation.</li>
-        </ul>
-      </div>
+      <div class="exp-meta"><span class="company">Quickbank</span><span class="period">2020 – 2022</span><span class="badge">Full-time · Remote</span></div>
+      <div class="exp-body"><h3>Mobile Developer</h3><ul><li>Developed a cross-platform React Native banking application from scratch, targeting both iOS and Android.</li><li>Implemented secure biometric and PIN-based authentication alongside encrypted transaction flows compliant with banking standards.</li><li>Worked closely with backend engineers to integrate payment processing, account management, and notification APIs.</li><li>Ensured consistent UX across platforms, with robust offline-handling and smooth state synchronisation.</li></ul></div>
     </div>
-
     <div class="exp-item">
-      <div class="exp-meta">
-        <span class="company">SecureMyId</span>
-        <span class="period">2017 – 2020</span>
-        <span class="badge">Full-time · Remote</span>
-      </div>
-      <div class="exp-body">
-        <h3>Frontend Developer</h3>
-        <ul>
-          <li>Built an end-to-end KYC onboarding flow for identity verification, improving user completion rates through streamlined UX.</li>
-          <li>Created a scalable reusable component library adopted across multiple internal product teams, reducing development time.</li>
-          <li>Implemented responsive, accessible interfaces aligned with WCAG guidelines for a diverse, wide-reaching user base.</li>
-          <li>Integrated document capture and biometric verification SDKs into the web platform to enable automated ID checks.</li>
-        </ul>
-      </div>
+      <div class="exp-meta"><span class="company">SecureMyId</span><span class="period">2017 – 2020</span><span class="badge">Full-time · Remote</span></div>
+      <div class="exp-body"><h3>Frontend Developer</h3><ul><li>Built an end-to-end KYC onboarding flow for identity verification, improving user completion rates through streamlined UX.</li><li>Created a scalable reusable component library adopted across multiple internal product teams, reducing development time.</li><li>Implemented responsive, accessible interfaces aligned with WCAG guidelines for a diverse, wide-reaching user base.</li><li>Integrated document capture and biometric verification SDKs into the web platform to enable automated ID checks.</li></ul></div>
     </div>
-
   </section>
 
-  <!-- AI -->
   <section id="ai">
     <p class="section-label">AI Integration &amp; Agent Development</p>
     <div class="ai-grid">
-      <div class="ai-card">
-        <div class="num">01</div>
-        <p><strong>LLM API Integration</strong> — Embedded OpenAI Codex 5.4 and Claude Opus 4.6 into production features: conversational interfaces, smart form completion, AI-assisted content generation, and intelligent search.</p>
-      </div>
-      <div class="ai-card">
-        <div class="num">02</div>
-        <p><strong>Agent Pipelines</strong> — Built AI agent pipelines and end-to-end automation workflows that reduced manual operational overhead significantly, using tool-calling and structured output techniques.</p>
-      </div>
-      <div class="ai-card">
-        <div class="num">03</div>
-        <p><strong>Prompt Engineering</strong> — Applied chain-of-thought and few-shot prompting best practices to ensure reliability and consistent output quality at scale across fintech and agri-tech domains.</p>
-      </div>
-      <div class="ai-card">
-        <div class="num">04</div>
-        <p><strong>Hybrid AI Systems</strong> — Designed hybrid AI + rule-based systems using Cursor Composer 2, balancing model flexibility with deterministic, auditable behaviour for anomaly detection and personalised recommendations.</p>
-      </div>
+      <div class="ai-card"><div class="num">01</div><p><strong>LLM API Integration</strong> — Embedded OpenAI Codex 5.4 and Claude Opus 4.6 into production features: conversational interfaces, smart form completion, AI-assisted content generation, and intelligent search.</p></div>
+      <div class="ai-card"><div class="num">02</div><p><strong>Agent Pipelines</strong> — Built AI agent pipelines and end-to-end automation workflows that reduced manual operational overhead significantly, using tool-calling and structured output techniques.</p></div>
+      <div class="ai-card"><div class="num">03</div><p><strong>Prompt Engineering</strong> — Applied chain-of-thought and few-shot prompting best practices to ensure reliability and consistent output quality at scale across fintech and agri-tech domains.</p></div>
+      <div class="ai-card"><div class="num">04</div><p><strong>Hybrid AI Systems</strong> — Designed hybrid AI + rule-based systems using Cursor Composer 2, balancing model flexibility with deterministic, auditable behaviour for anomaly detection and personalised recommendations.</p></div>
+      <a href="https://finagent-six.vercel.app" target="_blank" rel="noopener" class="ai-card-featured">
+        <div class="feat-num">05</div>
+        <div class="feat-body">
+          <strong>FinAgent — Live Project</strong>
+          <p>An agentic financial intelligence layer built for Africa. Chains six tools — FX conversion, loan calculation, risk scoring, credit evaluation, NGX &amp; crypto market data, and compound growth projections — into a single conversational interface, exposing every reasoning step as it works.</p>
+          <div class="feat-tags">
+            <span class="feat-tag">AI Agent</span>
+            <span class="feat-tag">Fintech</span>
+            <span class="feat-tag">Multi-tool</span>
+            <span class="feat-tag">Africa</span>
+          </div>
+          <span class="feat-link">View live ↗</span>
+        </div>
+      </a>
     </div>
   </section>
 
-  <!-- EDUCATION -->
   <section id="education">
     <p class="section-label">Education</p>
     <div class="edu-block">
-      <div>
-        <div class="edu-title">BSc. Computer Science (Honours)</div>
-        <div class="edu-sub">Benson Idahosa University · Benin City, Edo State</div>
-      </div>
+      <div><div class="edu-title">BSc. Computer Science (Honours)</div><div class="edu-sub">Benson Idahosa University · Benin City, Edo State</div></div>
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer>
     <span class="copy">© 2025 Honour U. Nosakhare</span>
     <div style="display:flex;align-items:center;gap:2rem;">
@@ -623,34 +191,17 @@
   </footer>
 
 </div>
-
 <script>
-  // Custom cursor
   const cursor = document.getElementById('cursor');
-  document.addEventListener('mousemove', e => {
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top = e.clientY + 'px';
-  });
+  document.addEventListener('mousemove', e => { cursor.style.left = e.clientX+'px'; cursor.style.top = e.clientY+'px'; });
   document.querySelectorAll('a, .skill-block, .ai-card, .exp-item').forEach(el => {
     el.addEventListener('mouseenter', () => cursor.classList.add('expand'));
     el.addEventListener('mouseleave', () => cursor.classList.remove('expand'));
   });
-
-  // Scroll reveal — add reveal class via JS so content is visible without JS
-  const sections = document.querySelectorAll('section');
   const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.remove('reveal');
-        entry.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.08 });
-
-  sections.forEach(s => {
-    s.classList.add('reveal');
-    observer.observe(s);
-  });
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.remove('reveal'); e.target.classList.add('visible'); } });
+  }, {threshold:0.08});
+  document.querySelectorAll('section').forEach(s => { s.classList.add('reveal'); observer.observe(s); });
 </script>
 </body>
 </html>
